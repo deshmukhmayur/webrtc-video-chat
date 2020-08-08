@@ -2,7 +2,12 @@
 
 /* Set up media stream constant and parameters */
 const mediaStreamConstraints = {
-  video: true,
+  video: {
+    facingMode: 'user',
+    width: { min: 640, ideal: 1280, max: 1920 },
+    height: { min: 360, ideal: 720, max: 1080 }
+  },
+  // audio: true,
 }
 
 const offerOptions = {
@@ -200,6 +205,18 @@ function startAction() {
     .catch(handleLocalMediaStreamError)
   trace('Requesting local stream.')
 }
+/* Handles stop button action: removes local MediaStream and disables the local Video */
+function stopAction() {
+  startAction.disabled = false
+  const stream = localVideo.srcObject
+  const tracks = localStream.getTracks()
+
+  tracks.forEach(function(track) {
+    track.stop()
+  })
+
+  localVideo.srcObject = null
+}
 
 /* Handles call button action: creates peer connection */
 function callAction() {
@@ -268,8 +285,8 @@ callButton.addEventListener('click', callAction)
 hangupButton.addEventListener('click', hangupAction)
 
 /* Autostart the localVideo */
-startButton.style.display = 'none';
-startAction();
+startButton.style.display = 'none'
+startAction()
 
 /* Gets the other "peer" connection */
 function getOtherPeer(peerConnection) {
